@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hangman — Word Game</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Nosifer&family=Creepster&family=Special+Elite&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     SCREEN 0 — Intro / Loading
+══════════════════════════════════════ -->
+<div id="screen-intro" class="screen active">
+  <div class="intro-bg"   id="intro-bg-a"></div>
+  <div class="intro-bg"   id="intro-bg-b"></div>
+  <div class="intro-static"></div>
+  <div class="intro-vignette"></div>
+
+  <!-- Gate: click required before audio can play -->
+  <div class="intro-gate" id="intro-gate">
+    <div class="brand-skulls">💀 &nbsp; 💀 &nbsp; 💀</div>
+    <h1 class="intro-title">HANGMAN</h1>
+    <p class="intro-warn">⚠ contains disturbing imagery &amp; sound — headphones recommended ⚠</p>
+    <button id="btn-enter" class="intro-enter-btn">ENTER IF YOU DARE</button>
+  </div>
+
+  <!-- Loading sequence: shown after the gate is clicked -->
+  <div class="intro-loading hidden" id="intro-loading">
+    <p class="intro-loading-line" id="intro-loading-line">loading&hellip;</p>
+    <div class="intro-bar"><div class="intro-bar-fill" id="intro-bar-fill"></div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCREEN 1 — Level Select
+══════════════════════════════════════ -->
+<div id="screen-level" class="screen">
+  <!-- full-screen background video -->
+  <video class="ls-bg-video" autoplay muted loop playsinline>
+    <source src="/static/videos/bg.mp4" type="video/mp4"/>
+  </video>
+
+  <!-- image mosaic behind everything -->
+  <div class="ls-mosaic" id="ls-mosaic">
+    <div class="mosaic-tile" data-cat="animals"></div>
+    <div class="mosaic-tile" data-cat="nature"></div>
+    <div class="mosaic-tile" data-cat="science"></div>
+    <div class="mosaic-tile" data-cat="history"></div>
+    <div class="mosaic-tile" data-cat="food"></div>
+    <div class="mosaic-tile" data-cat="technology"></div>
+    <div class="mosaic-tile" data-cat="mythology"></div>
+    <div class="mosaic-tile" data-cat="music"></div>
+    <div class="mosaic-tile" data-cat="geography"></div>
+    <div class="mosaic-tile" data-cat="sports"></div>
+    <div class="mosaic-tile" data-cat="entertainment"></div>
+    <div class="mosaic-tile" data-cat="everyday"></div>
+  </div>
+  <div class="ls-mosaic-veil"></div>
+
+  <!-- animated foreground -->
+  <canvas id="ls-canvas" class="ls-canvas"></canvas>
+  <div class="ls-orb orb1"></div>
+  <div class="ls-orb orb2"></div>
+  <div class="ls-orb orb3"></div>
+  <div class="ls-grid"></div>
+
+  <!-- approaching figure from darkness -->
+  <div class="ls-figure-wrap">
+    <img src="/static/images/figure.png" class="ls-figure" id="ls-figure" alt="" draggable="false" onerror="this.src='/static/images/figure.jpg'"/>
+    <div class="ls-figure-fog"></div>
+  </div>
+
+  <div class="ls-wrap">
+
+    <p class="ls-tagline">⚰️ &nbsp; Choose wisely — some words don't let go &nbsp; ⚰️</p>
+
+    <!-- Stats bar -->
+    <div class="stats-bar">
+      <div class="stat-box">
+        <span class="stat-val" id="stat-hs">0</span>
+        <span class="stat-lbl">High Score</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" id="stat-wins">0</span>
+        <span class="stat-lbl">Wins</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" id="stat-streak">0</span>
+        <span class="stat-lbl">Best Streak</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-val" id="stat-games">0</span>
+        <span class="stat-lbl">Games</span>
+      </div>
+    </div>
+
+    <p class="ls-label">Choose Your Difficulty</p>
+
+    <div class="level-cards">
+      <button class="level-card easy" data-level="easy">
+        <span class="lc-glow"></span>
+        <span class="lc-img-bg" data-cats="animals,nature"></span>
+        <span class="lc-emoji">🌱</span>
+        <span class="lc-name">Easy</span>
+        <span class="lc-sub">Short common words</span>
+        <div class="lc-stats">
+          <span>8 lives</span>
+          <span>×1 score</span>
+        </div>
+        <span class="lc-pill">Beginner</span>
+      </button>
+
+      <button class="level-card medium" data-level="medium">
+        <span class="lc-glow"></span>
+        <span class="lc-img-bg" data-cats="history,geography"></span>
+        <span class="lc-emoji">🔥</span>
+        <span class="lc-name">Medium</span>
+        <span class="lc-sub">Moderate difficulty</span>
+        <div class="lc-stats">
+          <span>6 lives</span>
+          <span>×1.5 score</span>
+        </div>
+        <span class="lc-pill">Classic</span>
+      </button>
+
+      <button class="level-card hard" data-level="hard">
+        <span class="lc-glow"></span>
+        <span class="lc-img-bg" data-cats="mythology,technology"></span>
+        <span class="lc-emoji">💀</span>
+        <span class="lc-name">Hard</span>
+        <span class="lc-sub">Long tricky words</span>
+        <div class="lc-stats">
+          <span>5 lives</span>
+          <span>×2 score</span>
+        </div>
+        <span class="lc-pill">Expert</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     SCREEN 2 — Game
+══════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <!-- full-screen BG overlay -->
+  <div id="bg-overlay" class="bg-overlay"></div>
+
+  <!-- content layer -->
+  <div class="game-layer">
+
+    <!-- Top bar -->
+    <header class="topbar">
+      <button id="btn-back" class="tb-btn">&#8592; Levels</button>
+      <div class="tb-center">
+        <span id="level-pill" class="level-pill"></span>
+        <span class="tb-title">HANGMAN</span>
+      </div>
+      <div class="tb-right">
+        <div class="tb-score-wrap">
+          <span class="tb-score-label">SCORE</span>
+          <span id="tb-score" class="tb-score">0</span>
+        </div>
+        <div class="tb-streak-wrap" id="streak-wrap">
+          <span class="tb-streak-label">STREAK</span>
+          <span id="tb-streak" class="tb-streak">0🔥</span>
+        </div>
+        <button id="btn-new" class="tb-btn">↺ New</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="game-main">
+
+      <!-- Left: gallows + lives -->
+      <aside class="col-left">
+        <div class="gallows-card">
+          <svg id="gallows-svg" viewBox="-15 -25 250 310" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%"  stop-color="#e8ecff" stop-opacity=".38"/>
+                <stop offset="65%" stop-color="#7d86b8" stop-opacity=".14"/>
+                <stop offset="100%" stop-color="#7d86b8" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="rough-wood" x="-30%" y="-30%" width="160%" height="160%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.015 0.09" numOctaves="2" seed="7" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+              </filter>
+            </defs>
+
+            <!-- pale moon glow, upper corner -->
+            <circle cx="24" cy="6" r="50" fill="url(#moon-glow)"/>
+
+            <!-- crows perched on the crossbeam -->
+            <path class="g-crow" d="M96,16 q-5,-7 -10,-1 q5,-1 6,3 q1,-4 6,-1 q-5,-6 -10,-1 z"/>
+            <path class="g-crow" d="M128,16 q-5,-7 -10,-1 q5,-1 6,3 q1,-4 6,-1 q-5,-6 -10,-1 z"/>
+
+            <!-- ground mist -->
+            <ellipse cx="110" cy="264" rx="135" ry="15" class="g-mist"/>
+
+            <!-- structure (roughened, hand-hewn wood) -->
+            <g filter="url(#rough-wood)">
+              <line x1="15"  y1="260" x2="205" y2="260" class="g-struct"/>
+              <line x1="65"  y1="260" x2="65"  y2="15"  class="g-struct"/>
+              <line x1="65"  y1="15"  x2="160" y2="15"  class="g-struct"/>
+              <line x1="65"  y1="60"  x2="105" y2="15"  class="g-brace"/>
+            </g>
+
+            <!-- noose + hanged figure, swaying gently -->
+            <g class="noose-swing">
+              <line x1="160" y1="15"  x2="160" y2="45"  class="g-rope"/>
+              <!-- body parts -->
+              <circle id="p-head" cx="160" cy="63" r="19" class="bp"/>
+              <line   id="p-body" x1="160" y1="82"  x2="160" y2="155" class="bp"/>
+              <line   id="p-larm" x1="160" y1="102" x2="126" y2="135" class="bp"/>
+              <line   id="p-rarm" x1="160" y1="102" x2="194" y2="135" class="bp"/>
+              <line   id="p-lleg" x1="160" y1="155" x2="126" y2="205" class="bp"/>
+              <line   id="p-rleg" x1="160" y1="155" x2="194" y2="205" class="bp"/>
+              <!-- face (revealed on loss) -->
+              <g id="p-face" class="bp face">
+                <circle cx="152" cy="59" r="4" class="eye"/>
+                <circle cx="168" cy="59" r="4" class="eye"/>
+                <path d="M149 73 Q160 65 171 73" class="mouth"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+
+        <!-- Lives -->
+        <div class="lives-wrap">
+          <div id="lives-dots" class="lives-dots"></div>
+          <p class="lives-label">lives left</p>
+        </div>
+      </aside>
+
+      <!-- Right: word + clue + keyboard -->
+      <section class="col-right">
+
+        <!-- Category + clue -->
+        <div class="clue-block">
+          <div class="cat-badge" id="cat-badge">
+            <span id="cat-emoji"></span>
+            <span id="cat-name"></span>
+          </div>
+          <p id="clue-text" class="clue-text"></p>
+          <p class="word-length-hint" id="word-length"></p>
+        </div>
+
+        <!-- Word display -->
+        <div id="word-display" class="word-display"></div>
+
+        <!-- Wrong guesses -->
+        <div class="wrong-row">
+          <span class="wrong-tag">Wrong:</span>
+          <div id="wrong-chips" class="wrong-chips"></div>
+        </div>
+
+        <!-- QWERTY keyboard -->
+        <div id="keyboard" class="keyboard"></div>
+
+      </section>
+    </main>
+  </div><!-- /game-layer -->
+
+  <!-- Result overlay -->
+  <div id="result-overlay" class="result-overlay hidden">
+    <div class="result-card">
+      <div id="res-icon"    class="res-icon"></div>
+      <div id="res-title"   class="res-title"></div>
+      <div id="res-word"    class="res-word"></div>
+      <div id="res-score"   class="res-score-line"></div>
+      <div id="res-streak"  class="res-streak-line"></div>
+      <div class="res-btns">
+        <button id="btn-play-again" class="res-btn primary">Play Again</button>
+        <button id="btn-change-level" class="res-btn ghost">Change Level</button>
+      </div>
+    </div>
+  </div>
+</div><!-- /screen-game -->
+
+<!-- CRT Scanlines Filter Overlay -->
+<div class="crt-overlay"></div>
+
+<!-- Possessed Glitch Overlay Canvas -->
+<canvas id="glitch-canvas" class="glitch-canvas"></canvas>
+
+<!-- Blood Splatter Overlay Canvas -->
+<canvas id="blood-canvas" class="blood-canvas"></canvas>
+
+<!-- Jumpscare Screamer Overlay -->
+<div id="screamer-overlay" class="screamer-overlay">
+  <img id="screamer-img" class="screamer-img" src="" alt=""/>
+</div>
+
+<!-- score pop-up -->
+<div id="score-pop" class="score-pop hidden"></div>
+
+<!-- confetti -->
+<canvas id="confetti-cv"></canvas>
+
+<script src="/static/script.js"></script>
+</body>
+</html>
