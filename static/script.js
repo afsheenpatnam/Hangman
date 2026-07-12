@@ -299,7 +299,7 @@ const INTRO_LINES = [
   "the letters are hungry…",
 ];
 
-const REVEAL_IMAGE = "/static/images/horrible%20%20(4).jpg"; // the reveal shown right after loading
+const REVEAL_IMAGE = "/static/images/horrible-4.jpg"; // the reveal shown right after loading
 
 let introImages     = [];
 let introImgTimer   = null;
