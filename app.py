@@ -9,13 +9,14 @@ from flask import Flask, Response, jsonify, render_template, request, send_from_
 from pymongo import MongoClient
 
 app = Flask(__name__)
-app.secret_key = "hangman-pro-2024"
+app.secret_key = os.environ.get("SECRET_KEY", "hangman-pro-2024")
 
 IMAGES_DIR = os.path.join(os.path.dirname(__file__), "static", "images")
 
 # ── MongoDB ──────────────────────────────────────────────────────────────────
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb://localhost:27017/")
 try:
-    _mongo = MongoClient("mongodb://localhost:27017/", serverSelectionTimeoutMS=3000)
+    _mongo = MongoClient(MONGO_URI, serverSelectionTimeoutMS=3000)
     _mongo.admin.command("ping")
     _db         = _mongo["hangman_db"]
     _stats_col  = _db["stats"]
